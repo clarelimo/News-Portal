@@ -29,7 +29,7 @@ public class DepartmentTest {
         department.setName("finance");
         assertNotEquals("technology",department.getName());
     }
-    
+
     @Test
     public void setDescriptionSetsCorrectDescription() throws Exception {
         Department department = setupDepartment();
