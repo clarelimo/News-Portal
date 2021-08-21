@@ -65,6 +65,7 @@ public class UserTest {
     //helper
     public User setupUser(){
         return  new User("larry","manager","news anchor",1);
+
     }
     
 }
