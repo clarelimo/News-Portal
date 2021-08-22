@@ -1,6 +1,7 @@
 package dao;
 
 import models.Department;
+import models.News;
 import models.User;
 import org.junit.After;
 import org.junit.Before;
@@ -13,12 +14,14 @@ import static org.junit.Assert.*;
 public class Sql2oDepartmentDaoTest {
     private Connection conn;
     private Sql2oDepartmentDao departmentDao;
+    private Sql2oNewsDao newsDao;
 
     @Before
     public void setUp() throws Exception {
         String connectionString = "jdbc:h2:mem:testing;INIT=RUNSCRIPT from 'classpath:db/create.sql'";
         Sql2o sql2o = new Sql2o(connectionString, "", "");
         departmentDao = new Sql2oDepartmentDao(sql2o);
+        newsDao = new Sql2oNewsDao(sql2o);
         conn = sql2o.open();
     }
 
@@ -57,12 +60,34 @@ public class Sql2oDepartmentDaoTest {
         assertEquals(0, departmentDao.getAll().size());
     }
 
-    //helpers
+    @Test
+    public void addNewsToDepartment() throws Exception{
+        Department department = setupDepartment();
+        Department department1 = setupDepartment();
 
+        departmentDao.add(department);
+        departmentDao.add(department1);
+
+        News news = new News("Miracles");
+        newsDao.add(news);
+
+        newsDao.addNewsToDepartment(news,department);
+        newsDao.addNewsToDepartment(news,department1);
+
+        assertEquals(2, newsDao.getAllDepartmentsForANews(news.getId()).size());
+    }
+
+    //helpers
     public Department setupDepartment(){
         Department department =  new Department("technology","build tech",20);
         departmentDao.add(department);
         return department;
+    }
+
+    public News setupNews(){
+        News news =  new News("BBI demolition");
+        newsDao.add(news);
+        return news;
     }
 
 

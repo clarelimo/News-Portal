@@ -32,6 +32,12 @@ public class Sql2oDepartmentDao implements DepartmentDao {
     }
 
     @Override
+    public void addDepartmentToNews(Department department, News news) {
+
+
+    }
+
+    @Override
     public List<Department> getAll() {
         try (Connection conn = sql2o.open()) {
             return conn.createQuery("SELECT * FROM departments")
@@ -40,7 +46,7 @@ public class Sql2oDepartmentDao implements DepartmentDao {
     }
 
     @Override
-    public List<News> getAllNewsForADepartment(int id) {
+    public List<News> getAllNewsForADepartment(int departmentId) {
         return null;
     }
 

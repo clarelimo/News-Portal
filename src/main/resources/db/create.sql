@@ -19,3 +19,9 @@ CREATE TABLE IF NOT EXISTS departments (
  description VARCHAR,
  numberofemployees INTEGER,
 );
+
+CREATE TABLE IF NOT EXISTS departments_news (
+ id int PRIMARY KEY auto_increment,
+ departmentid INTEGER,
+ newsid INTEGER
+);
