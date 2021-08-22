@@ -2,11 +2,11 @@ package dao;
 
 import models.Department;
 import models.News;
-import models.User;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sql2oDepartmentDao implements DepartmentDao {
@@ -33,8 +33,15 @@ public class Sql2oDepartmentDao implements DepartmentDao {
 
     @Override
     public void addDepartmentToNews(Department department, News news) {
-
-
+        String sql = "INSERT INTO departments_news (departmentid,newsid) VALUES (:departmentId,:newsId)";
+        try (Connection con = sql2o.open()) {
+            con.createQuery(sql)
+                    .addParameter("departmentId", department.getId())
+                    .addParameter("newsId", news.getId())
+                    .executeUpdate();
+        } catch (Sql2oException ex){
+            System.out.println(ex);
+        }
     }
 
     @Override
@@ -47,8 +54,26 @@ public class Sql2oDepartmentDao implements DepartmentDao {
 
     @Override
     public List<News> getAllNewsForADepartment(int departmentId) {
-        return null;
+        List<News> news = new ArrayList();
+        String joinQuery = "SELECT newsid FROM departments_news WHERE departmentid = :departmentId";
+
+        try (Connection con = sql2o.open()) {
+            List<Integer> allNewsIds = con.createQuery(joinQuery)
+                    .addParameter("departmentId", departmentId)
+                    .executeAndFetch(Integer.class);
+            for (Integer id : allNewsIds){
+                String newsQuery = "SELECT * FROM news WHERE id = :newsId";
+                news.add(
+                        con.createQuery(newsQuery)
+                                .addParameter("newsId", id)
+                                .executeAndFetchFirst(News.class));
+            }
+        } catch (Sql2oException ex){
+            System.out.println(ex);
+        }
+        return news;
     }
+
 
     @Override
     public void deleteById(int id) {
@@ -60,7 +85,6 @@ public class Sql2oDepartmentDao implements DepartmentDao {
         }catch (Sql2oException ex){
             System.out.println(ex);
         }
-
     }
 
     @Override
@@ -72,6 +96,5 @@ public class Sql2oDepartmentDao implements DepartmentDao {
         }catch (Sql2oException ex){
             System.out.println(ex);
         }
-
     }
 }

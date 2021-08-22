@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class Sql2oDepartmentDaoTest {
@@ -59,23 +62,32 @@ public class Sql2oDepartmentDaoTest {
         departmentDao.clearAll();
         assertEquals(0, departmentDao.getAll().size());
     }
-
     @Test
-    public void addNewsToDepartment() throws Exception{
-        Department department = setupDepartment();
-        Department department1 = setupDepartment();
-
-        departmentDao.add(department);
-        departmentDao.add(department1);
-
-        News news = new News("Miracles");
+    public void getAllNewsForADepartmentReturnsNewsCorrectly() throws Exception {
+        News news  = new News("The Cliff");
         newsDao.add(news);
 
-        newsDao.addNewsToDepartment(news,department);
-        newsDao.addNewsToDepartment(news,department1);
+        News otherNews  = new News("The rush hour");
+        newsDao.add(otherNews);
 
-        assertEquals(2, newsDao.getAllDepartmentsForANews(news.getId()).size());
+        Department department = setupDepartment();
+        departmentDao.add(department);
+        departmentDao.addDepartmentToNews(department,news);
+        departmentDao.addDepartmentToNews(department,otherNews);
+
+        News[] testNews = {news, otherNews};
+        List<News> test2News = departmentDao.getAllNewsForADepartment(department.getId());
+        for (News n:test2News
+        ) {
+
+            System.out.println("from dao "+n.getPost());
+
+        }
+        assertEquals(2,departmentDao.getAllNewsForADepartment(department.getId()).size());
+
+//        assertEquals(Arrays.asList(testNews), departmentDao.getAllNewsForADepartment(department.getId()));
     }
+
 
     //helpers
     public Department setupDepartment(){
