@@ -160,7 +160,7 @@ public class App {
             res.status(err.getStatusCode());
             res.body(gson.toJson(jsonMap));
         });
-        
+
         after((req, res) ->{
             res.type("application/json");
         });
