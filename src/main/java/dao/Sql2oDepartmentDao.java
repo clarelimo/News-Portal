@@ -74,6 +74,14 @@ public class Sql2oDepartmentDao implements DepartmentDao {
         return news;
     }
 
+    @Override
+    public Department findById(int id) {
+        try (Connection con = sql2o.open()) {
+            return con.createQuery("SELECT * FROM departments WHERE id = :id")
+                    .addParameter("id", id)
+                    .executeAndFetchFirst(Department.class);
+        }
+    }
 
     @Override
     public void deleteById(int id) {

@@ -76,6 +76,15 @@ public class Sql2oNewsDao implements NewsDao {
     }
 
     @Override
+    public News findById(int id) {
+        try (Connection con = sql2o.open()) {
+            return con.createQuery("SELECT * FROM news WHERE id = :id")
+                    .addParameter("id", id)
+                    .executeAndFetchFirst(News.class);
+        }
+    }
+
+    @Override
     public void deleteById(int id) {
         String sql = "DELETE from news WHERE id = :id";
         try  (Connection conn = sql2o.open()){
