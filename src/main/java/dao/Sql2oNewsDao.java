@@ -37,8 +37,8 @@ public class Sql2oNewsDao implements NewsDao {
         String sql = "INSERT INTO departments_news (newsid, departmentid) VALUES (:newsId, :departmentId)";
         try (Connection con = sql2o.open()) {
             con.createQuery(sql)
-                    .addParameter("newsId", news.getId())
                     .addParameter("departmentId", department.getId())
+                    .addParameter("newsId", news.getId())
                     .executeUpdate();
         } catch (Sql2oException ex){
             System.out.println(ex);
