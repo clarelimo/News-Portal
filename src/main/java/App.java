@@ -8,6 +8,11 @@ import models.News;
 import models.User;
 import org.sql2o.Sql2o;
 import org.sql2o.Connection;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static spark.Spark.*;
 
 
@@ -113,18 +118,51 @@ public class App {
             return gson.toJson(departmentToFind);
         });
 
+        get("/departments/:id/users", "application/json", (req, res) -> {
+            int departmentId = Integer.parseInt(req.params("id"));
 
-        post("/user/new", "application/json", ((request, response) -> {
-            User user = gson.fromJson(request.body(),User.class);
-            userDao.add(user);
-            response.status(201);
-            response.type("application/json");
-            return gson.toJson(user);
-        }) );
+            Department departmentToFind = departmentDao.findById(departmentId);
+            List<User> allUsers;
+
+            if (departmentToFind == null){
+                throw new ApiException(404, String.format("No department with the id: \"%s\" exists", req.params("id")));
+            }
+
+            allUsers = userDao.getAllUsersForADepartment(departmentId);
+
+            return gson.toJson(allUsers);
+        });
+
+        get("/news", "application/json", (req, res) -> {
+            return gson.toJson(newsDao.getAll());
+        });
 
         get("/users", "application/json", (req, res) -> { //accept a request in format JSON from an app
             res.type("application/json");
             return gson.toJson(userDao.getAll());//send it back to be displayed
+        });
+
+        //CREATE
+        post("/department/new", "application/json", (req, res) -> {
+            Department department = gson.fromJson(req.body(), Department.class);
+            departmentDao.add(department);
+            res.status(201);
+            return gson.toJson(department);
+        });
+
+        //FILTERS
+        exception(ApiException.class, (exception, req, res) -> {
+            ApiException err = exception;
+            Map<String, Object> jsonMap = new HashMap<>();
+            jsonMap.put("status", err.getStatusCode());
+            jsonMap.put("errorMessage", err.getMessage());
+            res.type("application/json");
+            res.status(err.getStatusCode());
+            res.body(gson.toJson(jsonMap));
+        });
+        
+        after((req, res) ->{
+            res.type("application/json");
         });
 
     }
