@@ -85,9 +85,8 @@ public class Sql2oDepartmentDaoTest {
         }
         assertEquals(2,departmentDao.getAllNewsForADepartment(department.getId()).size());
 
-//        assertEquals(Arrays.asList(testNews), departmentDao.getAllNewsForADepartment(department.getId()));
+        assertEquals(Arrays.asList(testNews), departmentDao.getAllNewsForADepartment(department.getId()));
     }
-
 
     //helpers
     public Department setupDepartment(){
