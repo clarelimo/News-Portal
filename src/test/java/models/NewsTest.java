@@ -1,6 +1,5 @@
 package models;
 
-import org.h2.util.New;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
