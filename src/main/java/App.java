@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import dao.DB;
 import dao.Sql2oDepartmentDao;
 import dao.Sql2oNewsDao;
 import dao.Sql2oUserDao;
@@ -17,20 +18,42 @@ import static spark.Spark.*;
 
 
 public class App {
+    static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return 4567;
+    }
     public static void main(String[] args) {
+        port(getHerokuAssignedPort());
+
         Sql2oDepartmentDao departmentDao;
         Sql2oNewsDao newsDao;
         Sql2oUserDao userDao;
-        Connection conn;
         Gson gson = new Gson();
+        Connection conn;
 
 
-        String connectionString = "jdbc:postgresql://localhost:5432/news_portal";
-        Sql2o sql2o = new Sql2o(connectionString, "moringa", "climo");
+//        String connectionString = "jdbc:postgresql://ec2-35-153-91-18.compute-1.amazonaws.com:5432/de0r0hmokj3hb6";
+//        Sql2o sql2o = new Sql2o(connectionString, "hsnjntwebanrlr", "f7d44e3853a1f338b2e9934b4f0dacc7e65f78bfa55c9417ff7b42046acd6bec");
 
-        departmentDao = new Sql2oDepartmentDao(sql2o);
-        newsDao = new Sql2oNewsDao(sql2o);
-        userDao = new Sql2oUserDao(sql2o);
+        departmentDao = new Sql2oDepartmentDao(DB.sql2o);
+        newsDao = new Sql2oNewsDao(DB.sql2o);
+        userDao = new Sql2oUserDao(DB.sql2o);
+        conn = DB.sql2o.open();
+
+        get("/", "application/json", (req, res) -> {
+            System.out.println(departmentDao.getAll());
+
+            if(departmentDao.getAll().size() > 0){
+                return gson.toJson(departmentDao.getAll());
+            }
+
+            else {
+                return "{\"message\":\"I'm sorry, but no departments are currently listed in the database.\"}";
+            }
+        });
 
 
         //CREATE
@@ -151,15 +174,15 @@ public class App {
         });
 
         //FILTERS
-        exception(ApiException.class, (exception, req, res) -> {
-            ApiException err = exception;
-            Map<String, Object> jsonMap = new HashMap<>();
-            jsonMap.put("status", err.getStatusCode());
-            jsonMap.put("errorMessage", err.getMessage());
-            res.type("application/json");
-            res.status(err.getStatusCode());
-            res.body(gson.toJson(jsonMap));
-        });
+//        exception(ApiException.class, (exception, req, res) -> {
+//            ApiException err = exception;
+//            Map<String, Object> jsonMap = new HashMap<>();
+//            jsonMap.put("status", err.getStatusCode());
+//            jsonMap.put("errorMessage", err.getMessage());
+//            res.type("application/json");
+//            res.status(err.getStatusCode());
+//            res.body(gson.toJson(jsonMap));
+//        });
 
         after((req, res) ->{
             res.type("application/json");

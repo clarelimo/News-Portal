@@ -4,7 +4,6 @@ import models.Department;
 import models.User;
 import org.junit.*;
 import org.sql2o.Connection;
-import org.sql2o.Sql2o;
 
 import static org.junit.Assert.*;
 
@@ -16,11 +15,9 @@ public class Sql2oUserDaoTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        String connectionString = "jdbc:postgresql://localhost:5432/news_portal_test";
-        Sql2o sql2o = new Sql2o(connectionString, "moringa", "climo");
-        departmentDao = new Sql2oDepartmentDao(sql2o);
-        userDao = new Sql2oUserDao(sql2o);
-        conn = sql2o.open();
+        departmentDao = new Sql2oDepartmentDao(DatabaseRule.sql2o);
+        userDao = new Sql2oUserDao(DatabaseRule.sql2o);
+        conn = DatabaseRule.sql2o.open();
     }
 
     @After
